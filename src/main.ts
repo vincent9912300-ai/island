@@ -25,6 +25,7 @@ import { Player } from './player/Player';
 import { Vegetation, vegU, type RockModel } from './veg/Vegetation';
 import { buildCanopy } from './veg/Canopy';
 import { Hud } from './ui/Hud';
+import { Checkpoints } from './game/Checkpoints';
 import { DebugOverlay } from './ui/DebugOverlay';
 import { River } from './water/River';
 import { Village } from './world/Village';
@@ -205,6 +206,8 @@ async function boot() {
 
   engine.setupPost();
   const hud = new Hud(params.hud);
+  const checkpoints = new Checkpoints(scene, hf);
+  checkpoints.onToast = (m) => hud.toast(m);
   const dbg = new DebugOverlay({
     adapter: gpuName || engine.adapterInfo.description || engine.adapterInfo.vendor || 'unknown GPU',
     backend: engine.backendName,
@@ -233,6 +236,7 @@ async function boot() {
     const intent = input.read(dt);
     if (input.hit('KeyP') || input.hit('KeyF')) setPhoto(!photo);
     if (input.hit('KeyM')) audio.mute(!audio.muted);
+    if (!photo) checkpoints.update(dt, player.pos.x, player.pos.z, input);
     if (photo && input.hit('BracketLeft')) { rig.baseFov = Math.max(15, rig.baseFov - 5); camera.fov = rig.baseFov; camera.updateProjectionMatrix(); }
     if (photo && input.hit('BracketRight')) { rig.baseFov = Math.min(90, rig.baseFov + 5); camera.fov = rig.baseFov; camera.updateProjectionMatrix(); }
     // the near cascade renders every frame, the middle and far ones take turns (a frame of lag there is invisible
@@ -290,7 +294,11 @@ async function boot() {
     village.update(t, (i) => ocean.sim.probe(i), tod.night);
     lighthouse.update(dt, tod.night);
     birds.update(t, tod.night, camera.position);
-    hud.update(dt, player.pos.x, player.pos.z, tod.hour, weather.kind);
+    hud.update(dt, player.pos.x, player.pos.z, tod.hour, weather.kind, {
+      lit: checkpoints.lit,
+      near: checkpoints.near,
+      heading: player.heading,
+    });
     dbg.update(dt);
     vegU.sunColor.value.copy(sunLight.color).multiplyScalar(sunLight.intensity);
     // (with two cascades the far one renders every other frame; with three, the turn-taking above already covers it:
@@ -384,7 +392,7 @@ async function boot() {
   let booting = true;
   engine.start();
   Object.assign(ctx, {
-    hf, terrain, sky, csm, ocean, spray, player, playerObj: player, cameraRig: rig, input, colliders, veg, kit, village, lighthouse, weather, audio, hud, dbg,
+    hf, terrain, sky, csm, ocean, spray, player, playerObj: player, cameraRig: rig, input, colliders, veg, kit, village, lighthouse, weather, audio, hud, dbg, checkpoints,
     rts: { transmittance: transmittanceRT, skyView: skyViewRT, cloud: cloudRT },
     dayMinutes: params.dayMinutes,
     isBusy: () => booting || streaming > 0 || assetProgress.pending > assetProgress.done || engine.pipelinesPending > 0,

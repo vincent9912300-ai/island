@@ -215,6 +215,13 @@ export const SPOTS: Spot[] = [
   // on the gallery deck inside the railing (2.6 m from the tower axis), walking clockwise round it toward the
   // view over the island (the railing stops anyone walking straight out)
   { name: 'lighthouse', player: [-300 + Math.cos(2.46) * 2.6, -300 + Math.sin(2.46) * 2.6], yaw: 2.46 },
+
+  // random checkpoints: on the walking paths, spread across the island (facing along the trail)
+  { name: 'checkpoint-1', player: [335, -60], yaw: -1.82 },   // river trail, between beach and waterfall
+  { name: 'checkpoint-2', player: [0, -112], yaw: -1.28 },    // plateau trail, upstream of the falls
+  { name: 'checkpoint-3', player: [-410, 110], yaw: 0.3 },    // summit trail, jungle switchbacks
+  { name: 'checkpoint-4', player: [120, 420], yaw: 1.39 },    // south shore trail
+  { name: 'checkpoint-5', player: [188, 16], yaw: -2.5 },     // ramp trail at the foot of the escarpment
 ];
 
 /** the spawn: on the beach at sunrise, facing the sea and the rising sun */

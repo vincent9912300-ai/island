@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.vite-cache/
+*.log
+*.mp4
+*.webm
+.env*
+.DS_Store
+# raw downloads and scratch never live in the repo (they go to E:\tmp\island)
+/raw/
+/shots/
+/.agent-notes/
+__pycache__/
+*.pyc
+
+# Exported chat logs (keep out of the public repo)
+cursor-chats/
